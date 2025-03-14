@@ -11,6 +11,7 @@
 
 ```bash
 sudo apt install -y virt-manager qemu-system  osinfo-db-tools guestfs-tools bridge-utils
+sudo osinfo-db-import --local --latest
 ```
 
 ## basic ops
