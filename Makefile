@@ -92,6 +92,18 @@ install-vm: ${img}
 	--boot hd \
 	--import
 
+#cf. https://docs.redhat.com/ja/documentation/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-guest_virtual_machine_installation_overview-creating_guests_with_virt_install
+#cf. https://docs.redhat.com/ja/documentation/red_hat_enterprise_linux/8/html-single/configuring_and_managing_virtualization/index#proc_booting-virtual-machines-using-pxe-and-a-virtual-network_assembly_booting-virtual-machines-from-a-pxe-server
+# use NAT mode
+install-vm-nat: ${img}
+	virt-install ${connOpt} \
+	--disk path=${img} --name ${vName} --memory ${mem} --vcpu ${cpu} --network network=default,model=virtio,mac=${mac} \
+	--osinfo debian12  \
+	--noautoconsole  --noreboot \
+	--boot hd \
+	--import
+
+
 # clone VM, virt-clone can change mac but others. so configure cpu and memory in additional.
 clone-vm::
 	virt-clone --original ${base} --name ${vName} --mac ${mac} --file ${img}
