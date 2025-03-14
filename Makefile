@@ -133,7 +133,7 @@ config-vm-memory:
 config-vm-mac:: backup-vm-config
 	# update MAC in XML
 	xmlstarlet edit --inplace --update '/domain/devices/interface[@type="bridge"]/source[@bridge="${nic}"]/../mac/@address' --value "${mac}" ${conf}
-config-vm-mac:: rm-vm load-vm
+config-vm-mac:: unload-vm load-vm
 
 config-vm-nic:
 	virt-customize -a ${img} \
@@ -175,9 +175,9 @@ shutdown-vm::
 shutdown-vm:: list-vm
 
 # unload VM from libvirt, but keep disk image
-rm-vm:: shutdown-vm backup-vm-config
+unload-vm:: shutdown-vm backup-vm-config
 	-virsh ${connOpt} undefine ${vName}
-rm-vm:: list-vm
+unload-vm:: list-vm
 
 # purge VM config from libvirt, remove disk image and config file.
 purge-vm:: shutdown-vm
