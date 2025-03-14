@@ -1,8 +1,8 @@
 # Makefile
 wDir    ?=${PWD}
 
-# NIC for bridging I/F to use the same network address with guest, host, its neighbors.
-bridge  ?=br0
+# NIC in host to use the same network address with guest, host, its neighbors.
+nic  ?=br0
 
 # distr: linux distribution, check list by `virt-builder -l`
 distr   ?=debian-12
@@ -41,8 +41,8 @@ mDir        ?=/mnt/virtfs/${vName}
 guest_ip_starts ?= 90
 # make NIC config for guest based on host
 nameservers ?=$(shell cat /etc/resolv.conf | grep -v ^# | grep nameserver | awk '{print $$2}' | paste -sd " " - )
-gateway     ?=$(shell ip route | grep " ${bridge}"  | grep ^default  | awk '{print $$3}' )
-address     ?=$(shell ip addr show ${bridge} | grep ' inet ' | awk '{print $$2}' | awk -F '[./]' -v n=${n} -v b=${guest_ip_starts} 'BEGIN {OFS="."} {print $$1,$$2,$$3,b+n "/"$$5}')
+gateway     ?=$(shell ip route | grep " ${nic}"  | grep ^default  | awk '{print $$3}' )
+address     ?=$(shell ip addr show ${nic} | grep ' inet ' | awk '{print $$2}' | awk -F '[./]' -v n=${n} -v b=${guest_ip_starts} 'BEGIN {OFS="."} {print $$1,$$2,$$3,b+n "/"$$5}')
 guest_ip_mode ?=static
 #guest_ip_mode ?=dhcp
 
@@ -86,7 +86,7 @@ list-supported-os-for-build:
 # cf. https://qiita.com/nekakoshi/items/55fae55ab51163ea867c
 install-vm: ${img}
 	virt-install ${connOpt} \
-	--disk path=${img} --name ${vName} --memory ${mem} --vcpu ${cpu} --network bridge=${bridge},model=virtio,mac=${mac} \
+	--disk path=${img} --name ${vName} --memory ${mem} --vcpu ${cpu} --network bridge=${nic},model=virtio,mac=${mac} \
 	--osinfo debian12  \
 	--noautoconsole  --noreboot \
 	--boot hd \
@@ -127,12 +127,12 @@ config-vm-memory:
 	-virsh ${connOpt} setmem    ${vName} ${mem}M --config
 
 # configure mac for VM instance. it requires XML processing because virsh has no subcommand.
-#   pick   by xmlstarlet:   cat dom.xml | xmlstarlet sel               -t -v '/domain/devices/interface[@type="bridge"]/source[@bridge="${bridge}"]/../mac/@address' -nl
-#   update by xmlstarlet:   cat dom.xml | xmlstarlet edit --inplace --update '/domain/devices/interface[@type="bridge"]/source[@bridge="${bridge}"]/../mac/@address' --value "newMac"
+#   pick   by xmlstarlet:   cat dom.xml | xmlstarlet sel               -t -v '/domain/devices/interface[@type="bridge"]/source[@bridge="${nic}"]/../mac/@address' -nl
+#   update by xmlstarlet:   cat dom.xml | xmlstarlet edit --inplace --update '/domain/devices/interface[@type="bridge"]/source[@bridge="${nic}"]/../mac/@address' --value "newMac"
 # backup config into XML => updaye XML => reload(unload once)
 config-vm-mac:: backup-vm-config
 	# update MAC in XML
-	xmlstarlet edit --inplace --update '/domain/devices/interface[@type="bridge"]/source[@bridge="${bridge}"]/../mac/@address' --value "${mac}" ${conf}
+	xmlstarlet edit --inplace --update '/domain/devices/interface[@type="bridge"]/source[@bridge="${nic}"]/../mac/@address' --value "${mac}" ${conf}
 config-vm-mac:: rm-vm load-vm
 
 config-vm-nic:
