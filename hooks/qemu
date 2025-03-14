@@ -1,0 +1,55 @@
+#!/usr/bin/python3
+
+# sample of /etc/libvirt/hooks/qemu
+# cf. https://redj.hatenablog.com/entry/2019/02/18/025503
+
+import os
+import os.path
+import sys
+import subprocess
+import yaml
+
+def run_command(command):
+    cmd = command.split(' ')
+    print(cmd, file=sys.stderr)
+    subprocess.run(cmd)
+
+def entries(entries):
+    for entry in entries:
+        yield (entry, entry["bridge"], entry["vm_ip"])
+
+def forwardings(entry):
+    for forwarding in entry["forwardings"]:
+        yield ( str(forwarding["vm_port"]), str(forwarding["host_port"]),  forwarding["proto"] )
+
+def on_libvirt_hook(config, vm_name, operation, sub_operation, extra_argument):
+
+    if vm_name not in config:
+        return
+
+    todo=['-D'] # iptable ops (-D or -I)
+    if operation in ["start"]:
+        todo=['-I']
+    elif operation in ["stopped"]:
+        todo=['-D']
+    elif operation in ["reconnect"]:
+        todo=['-D', '-I']
+    else:
+        return
+
+    for op in todo:
+       for entry, bridge, vm_ip in entries(config[vm_name]):
+          for vm_port, host_port, proto in forwardings(entry):
+               run_command(f"/sbin/iptables {op} FORWARD -o {bridge} -p {proto} -d {vm_ip} --dport {vm_port} -j ACCEPT")
+               run_command(f"/sbin/iptables -t nat {op} PREROUTING -p {proto} --dport {host_port} -j DNAT --to {vm_ip}:{vm_port}")
+
+if __name__ == '__main__':
+    print(f"detected <params:{len(sys.argv)-1}> :  {' '.join(sys.argv)}", file=sys.stderr)
+
+    config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "port-forwarding.yaml")
+    with open(config_file) as f:
+        config = yaml.load(f, Loader=yaml.SafeLoader)
+
+    if config in [None, {}]:
+       exit(0)
+    on_libvirt_hook(config, sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])

@@ -1,0 +1,24 @@
+# externaly defined port forwarding rule for /etc/libvirt/hooks/qemu
+# cf. https://redj.hatenablog.com/entry/2019/02/18/025503
+#
+vm00:
+  - vm_ip: 192.168.122.2
+    bridge: virbr0
+    forwardings:
+      - vm_port: 22
+        host_port: 22022
+        proto: tcp
+#     - vm_port: 80
+#       host_port: 10080
+#       proto: tcp
+#
+#otherVMname:
+# - vm_ip: 192.168.122.3
+#   bridge: virbr0
+#   forwardings:
+#     - vm_port: 22
+#       host_port: 20023
+#       proto: tcp
+#     - vm_port: 53
+#       host_port: 53053
+#       proto: udp
