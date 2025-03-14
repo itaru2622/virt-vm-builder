@@ -24,15 +24,15 @@ make build guest_ip_mode=dhcp
 make install-vm
 make install-vm-nat
 
-# start/shutdown vm00
+# start/shutdown
 make start-vm
 make shutdown-vm
 
-# unload/load vm00
+# unload/load
 make unload-vm
 make load-vm
 
-#purge vm00
+#purge
 make purge-vm
 ```
 
@@ -65,34 +65,38 @@ ifconfig virbr0
 make build install-vm-nat  guest_ip_mode=static address=192.168.122.2/24 gateway=192.168.122.1 nameservers=192.168.122.1 mac=08:00:27:00:00:00 vName=myVMname
 make start-vm vName=myVMname
 
-# deploy port-forwaring rule to /etc/libvirt/hooks/qemu. when you involve 'echo hi' in script, you see it in log
+# deploy port-forwaring rule to /etc/libvirt/hooks/qemu.
 # check log
 systemctl status libvirtd.service
 ```
 
 ```yaml
-# port-forwarding.yaml
-#
+# port-forwarding.yaml as externaly defined rule for /etc/libvirt/hooks/qemu
 myVMname:
-  - bridge: virbr0
-    vm_ip: 192.168.122.2
+  - vm_ip: 192.168.122.2
+    bridge: virbr0
     forwardings:
       - vm_port: 22
         host_port: 22022
+        proto: tcp
 #     - vm_port: 80
 #       host_port: 10080
-vm00:
-  - bridge: virbr0
-    vm_ip: 192.168.122.3
+#       proto: tcp
+#
+vm00
+  - vm_ip: 192.168.122.3
+    bridge: virbr0
     forwardings:
       - vm_port: 22
-        host_port: 22023
+        host_port: 20023
+        proto: tcp
 ```
 
 ```python
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
-# sample /etc/libvirt/hooks/qemu
+# sample of /etc/libvirt/hooks/qemu
+
 import os
 import os.path
 import sys
@@ -110,7 +114,7 @@ def entries(entries):
 
 def forwardings(entry):
     for forwarding in entry["forwardings"]:
-        yield ( str(forwarding["host_port"]),  str(forwarding["vm_port"]) )
+        yield ( str(forwarding["vm_port"]), str(forwarding["host_port"]),  forwarding["proto"] )
 
 def on_libvirt_hook(config, vm_name, operation, sub_operation, extra_argument):
 
@@ -129,9 +133,9 @@ def on_libvirt_hook(config, vm_name, operation, sub_operation, extra_argument):
 
     for op in todo:
        for entry, bridge, vm_ip in entries(config[vm_name]):
-          for host_port, vm_port in forwardings(entry):
-               run_command(f"/sbin/iptables {op} FORWARD -o {bridge} -p tcp -d {vm_ip} --dport {vm_port} -j ACCEPT")
-               run_command(f"/sbin/iptables -t nat {op} PREROUTING   -p tcp --dport {host_port} -j DNAT --to {vm_ip}:{vm_port}")
+          for vm_port, host_port, proto in forwardings(entry):
+               run_command(f"/sbin/iptables {op} FORWARD -o {bridge} -p {proto} -d {vm_ip} --dport {vm_port} -j ACCEPT")
+               run_command(f"/sbin/iptables -t nat {op} PREROUTING -p {proto} --dport {host_port} -j DNAT --to {vm_ip}:{vm_port}")
 
 if __name__ == '__main__':
     config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "port-forwarding.yaml")
@@ -140,5 +144,6 @@ if __name__ == '__main__':
 
     if config in [None, {}]:
        exit(0)
+    print(f"detected <params:{len(sys.argv)-1}> :  {' '.join(sys.argv)} ", file=sys.stderr)
     on_libvirt_hook(config, sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
 ```
