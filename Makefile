@@ -4,17 +4,18 @@ wDir    ?=${PWD}
 # NIC in host to use the same network address with guest, host, its neighbors.
 nic  ?=br0
 
-# distr: linux distribution, check list by `virt-builder -l`
+# distr:  controled term to select prebuild guest image,  one in `virt-builder -l`, used by virt-builder command
+# osinfo: controled term to optimize the guest VM, one in `osinfo-query os`, used by virt-install command
 distr   ?=debian-12
+osinfo  ?=debian12
 base    ?=debian12-base
 vFormat ?=qcow2
 
 # account in VM
 rootPass ?=root
-uID      ?=1000
-uName    ?=itaru
+uID      ?=$(shell id -u)
+uName    ?=$(shell id -u -n)
 uPass    ?=${uName}
-
 
 # default connection for libvirt
 #conn ?=qemu:///session
@@ -74,7 +75,7 @@ rebuild: ${img}
 	--install ${pkgs} \
 	--uninstall inetutils-telnet,systemd-resolved \
 	--upload ${wDir}/custom.sh:/tmp \
-	--run-command "/tmp/custom.sh uid=1000 uname=${uName} passwd=${uPass}" \
+	--run-command "/tmp/custom.sh uid=${uID} uname=${uName} passwd=${uPass}" \
 	--upload ${wDir}/custom-nic.sh:/tmp \
 	--run-command "/tmp/custom-nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" " \
 	--delete /etc/resolv.conf  --delete /run/systemd/resolve/resolv.conf
@@ -87,7 +88,7 @@ list-supported-os-for-build:
 install-vm: ${img}
 	virt-install ${connOpt} \
 	--disk path=${img} --name ${vName} --memory ${mem} --vcpu ${cpu} --network bridge=${nic},model=virtio,mac=${mac} \
-	--osinfo debian12  \
+	--osinfo ${osinfo}  \
 	--noautoconsole  --noreboot \
 	--boot hd \
 	--import
@@ -98,7 +99,7 @@ install-vm: ${img}
 install-vm-nat: ${img}
 	virt-install ${connOpt} \
 	--disk path=${img} --name ${vName} --memory ${mem} --vcpu ${cpu} --network network=default,model=virtio,mac=${mac} \
-	--osinfo debian12  \
+	--osinfo ${osinfo}  \
 	--noautoconsole  --noreboot \
 	--boot hd \
 	--import
@@ -199,4 +200,5 @@ echo:
 	@echo "guest_ip:    ${address}"
 	@echo "router_ip:   ${gateway}"
 	@echo "nameservers: ${nameservers}"
-
+	@echo "uID:         ${uID}"
+	@echo "uName:       ${uName}"
