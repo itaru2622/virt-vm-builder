@@ -7,11 +7,12 @@
 - Makefile to make ops easy.
 - base VM image is debian-12, defined in Makefile
 
-## install packages for qemu/virt
+## install packages and prepare for qemu/virt
 
 ```bash
 sudo apt install -y virt-manager qemu-system  osinfo-db-tools guestfs-tools bridge-utils
 sudo osinfo-db-import --local --latest
+sudo usermod -aG kvm,libvirt,libvirt-qemu USER
 ```
 
 ## basic ops
