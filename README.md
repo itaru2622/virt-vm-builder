@@ -4,6 +4,8 @@
    - https://libvirt.org/
    - https://libvirt.org/apps.html
    - https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/8/html-single/configuring_and_managing_virtualization/index
+   - debian qcow2 images: https://cloud.debian.org/images/cloud/
+      - https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-nocloud-amd64.qcow2
 - Makefile to make ops easy.
 - base VM image is debian-12, defined in Makefile
 
