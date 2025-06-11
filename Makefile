@@ -47,10 +47,11 @@ address     ?=$(shell ip addr show ${nic} | grep ' inet ' | awk '{print $$2}' | 
 guest_ip_mode ?=static
 #guest_ip_mode ?=dhcp
 
-pkgs_base    ?=ifupdown,openresolv,net-tools,openssh-server,vim,bash-completion,sudo,curl,keyboard-configuration
+pkgs_base    ?=ifupdown,openresolv,net-tools,openssh-server,vim,bash-completion,sudo,curl,keyboard-configuration,network-manager
 pkgs_extra   ?=locales-all,git,make,screen,inxi
 pkgs         ?=${pkgs_base}
 
+rm_pkgs      ?=inetutils-telnet,systemd-resolved,netplan.io
 
 # build guest image from virt-builder-repository, such as libguestfs.org etc.
 build: echo ${img}
@@ -59,7 +60,7 @@ ${img}:
 	--hostname ${vName} \
 	--root-password password:${rootPass} \
 	--install ${pkgs} \
-	--uninstall inetutils-telnet,systemd-resolved \
+	--uninstall ${rm_pkgs} \
 	--upload ${wDir}/custom.sh:/tmp \
 	--run-command "/tmp/custom.sh uid=${uID} uname=${uName} passwd=${uPass}" \
 	--upload ${wDir}/custom-nic.sh:/tmp \
@@ -73,7 +74,7 @@ rebuild: ${img}
 	--hostname ${vName} \
 	--root-password password:${rootPass} \
 	--install ${pkgs} \
-	--uninstall inetutils-telnet,systemd-resolved \
+	--uninstall ${rm_pkgs} \
 	--upload ${wDir}/custom.sh:/tmp \
 	--run-command "/tmp/custom.sh uid=${uID} uname=${uName} passwd=${uPass}" \
 	--upload ${wDir}/custom-nic.sh:/tmp \
