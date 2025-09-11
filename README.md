@@ -17,6 +17,18 @@ sudo osinfo-db-import --local --latest
 sudo usermod -aG kvm,libvirt,libvirt-qemu USER
 ```
 
+## setup network on host
+
+```bash
+# enable bridging, just like docker needs.
+sudo iptables -I FORWARD -m physdev --physdev-is-bridged -j ACCEPT
+# to disable bridging, just like docker needs.
+# sudo iptables -D FORWARD -m physdev --physdev-is-bridged -j ACCEPT
+
+# to persist the above, use iptables-save or alternatives.
+# for debian,  apt install iptables-persistent ; netfilter-persistant save
+```
+
 ## basic ops
 
 ```bash
