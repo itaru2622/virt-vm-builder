@@ -76,3 +76,47 @@ make start-vm vName=vm00
 systemctl status libvirtd.service
 ```
 
+## increase/resize filesystem.partition of VM (qcow2).
+
+- check current size and partition @ inside VM
+
+```bash
+sudo df -h
+sudo fdisk -l
+sudo shutdown -h now
+```
+
+- check and resize qcow2 @ VM host
+
+```bash
+n=0
+# check current size of qcow2
+qemu-img info   -f qcow2 vm0${n}.qcow2
+
+# increase size for qcow2.
+qemu-img resize -f qcow2 vm0${n}.qcow2 +5G
+# start vm
+```
+
+- resize partition @ inside VM
+
+```bash
+# check current partition size:
+sudo fdisk -l
+
+# to resize partion /dev/vda1
+sudo growpart /dev/vda 1
+
+# check new partition size:
+sudo fdisk -l
+
+# reboot and continue more...
+sudo shutdown -r now
+```
+
+- resize filesystem  @ inside VM
+
+```bash
+# to resize filesystem /dev/vda1
+sudo /sbin/resize2fs /dev/vda1
+```
