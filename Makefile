@@ -1,5 +1,6 @@
 # Makefile
 wDir    ?=${PWD}
+sDir    ?=${wDir}/setup.d
 
 # NIC in host to use the same network address with guest, host, its neighbors.
 nic  ?=br0
@@ -61,9 +62,11 @@ ${img}:
 	--root-password password:${rootPass} \
 	--install ${pkgs} \
 	--uninstall ${rm_pkgs} \
-	--upload ${wDir}/custom.sh:/tmp \
+	--upload ${sDir}/custom.sh:/tmp \
 	--run-command "/tmp/custom.sh uid=${uID} uname=${uName} passwd=${uPass}" \
-	--upload ${wDir}/custom-nic.sh:/tmp \
+	--upload ${sDir}/docker.sh:/tmp \
+	--run-command "/tmp/docker.sh uname=${uName}" \
+	--upload ${sDir}/custom-nic.sh:/tmp \
 	--run-command "/tmp/custom-nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" " \
 	--delete /etc/resolv.conf  --delete /run/systemd/resolve/resolv.conf
 
@@ -75,9 +78,11 @@ rebuild: ${img}
 	--root-password password:${rootPass} \
 	--install ${pkgs} \
 	--uninstall ${rm_pkgs} \
-	--upload ${wDir}/custom.sh:/tmp \
+	--upload ${sDir}/custom.sh:/tmp \
 	--run-command "/tmp/custom.sh uid=${uID} uname=${uName} passwd=${uPass}" \
-	--upload ${wDir}/custom-nic.sh:/tmp \
+	--upload ${sDir}/docker.sh:/tmp \
+	--run-command "/tmp/docker.sh uname=${uName}" \
+	--upload ${sDir}/custom-nic.sh:/tmp \
 	--run-command "/tmp/custom-nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" " \
 	--delete /etc/resolv.conf  --delete /run/systemd/resolve/resolv.conf
 
@@ -140,7 +145,7 @@ config-vm-mac:: unload-vm load-vm
 config-vm-nic:
 	virt-customize -a ${img} \
 	--hostname ${vName} \
-	--upload ${wDir}/custom-nic.sh:/tmp \
+	--upload ${sDir}/custom-nic.sh:/tmp \
 	--run-command "/tmp/custom-nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" "
 
 # dump VM config into file(xml).
