@@ -106,7 +106,8 @@ n=0
 qemu-img info   -f qcow2 vm0${n}.qcow2
 
 # increase size for qcow2.
-qemu-img resize -f qcow2 vm0${n}.qcow2 +5G
+s=30
+qemu-img resize -f qcow2 vm0${n}.qcow2 +${s}G
 # start vm
 ```
 
