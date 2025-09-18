@@ -48,8 +48,8 @@ address     ?=$(shell ip addr show ${nic} | grep ' inet ' | awk '{print $$2}' | 
 guest_ip_mode ?=static
 #guest_ip_mode ?=dhcp
 
-pkgs_base    ?=ifupdown,openresolv,net-tools,openssh-server,vim,bash-completion,sudo,curl,keyboard-configuration,network-manager,cloud-guest-utils,e2fsprogs
-pkgs_extra   ?=locales-all,git,make,screen,inxi
+pkgs_base    ?=ifupdown,openresolv,net-tools,openssh-server,vim,bash-completion,sudo,curl,keyboard-configuration,network-manager,cloud-guest-utils,e2fsprogs,locales-all,git,make,screen
+pkgs_extra   ?=inxi
 pkgs         ?=${pkgs_base}
 
 rm_pkgs      ?=inetutils-telnet,systemd-resolved,netplan.io
