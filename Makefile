@@ -62,12 +62,10 @@ ${img}:
 	--root-password password:${rootPass} \
 	--install ${pkgs} \
 	--uninstall ${rm_pkgs} \
-	--upload ${sDir}/custom.sh:/tmp \
-	--run-command "/tmp/custom.sh uid=${uID} uname=${uName} passwd=${uPass}" \
-	--upload ${sDir}/docker.sh:/tmp \
-	--run-command "/tmp/docker.sh uname=${uName}" \
-	--upload ${sDir}/custom-nic.sh:/tmp \
-	--run-command "/tmp/custom-nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" " \
+	--upload ${sDir}/grub.sh:/tmp    --run-command "/tmp/grub.sh" \
+	--upload ${sDir}/useradd.sh:/tmp --run-command "/tmp/useradd.sh uid=${uID} uname=${uName} passwd=${uPass}" \
+	--upload ${sDir}/docker.sh:/tmp  --run-command "/tmp/docker.sh uname=${uName}" \
+	--upload ${sDir}/nic.sh:/tmp     --run-command "/tmp/nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" " \
 	--delete /etc/resolv.conf  --delete /run/systemd/resolve/resolv.conf
 
 # build guest image from qcow2 provided by https://cloud.debian.org/images/cloud/ etc.
@@ -78,12 +76,10 @@ rebuild: ${img}
 	--root-password password:${rootPass} \
 	--install ${pkgs} \
 	--uninstall ${rm_pkgs} \
-	--upload ${sDir}/custom.sh:/tmp \
-	--run-command "/tmp/custom.sh uid=${uID} uname=${uName} passwd=${uPass}" \
-	--upload ${sDir}/docker.sh:/tmp \
-	--run-command "/tmp/docker.sh uname=${uName}" \
-	--upload ${sDir}/custom-nic.sh:/tmp \
-	--run-command "/tmp/custom-nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" " \
+	--upload ${sDir}/grub.sh:/tmp    --run-command "/tmp/grub.sh" \
+	--upload ${sDir}/useradd.sh:/tmp --run-command "/tmp/useradd.sh uid=${uID} uname=${uName} passwd=${uPass}" \
+	--upload ${sDir}/docker.sh:/tmp  --run-command "/tmp/docker.sh uname=${uName}" \
+	--upload ${sDir}/nic.sh:/tmp     --run-command "/tmp/nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" " \
 	--delete /etc/resolv.conf  --delete /run/systemd/resolve/resolv.conf
 
 # list up supported os by virt-build
@@ -145,8 +141,7 @@ config-vm-mac:: unload-vm load-vm
 config-vm-nic:
 	virt-customize -a ${img} \
 	--hostname ${vName} \
-	--upload ${sDir}/custom-nic.sh:/tmp \
-	--run-command "/tmp/custom-nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" "
+	--upload ${sDir}/nic.sh:/tmp  --run-command "/tmp/nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" "
 
 # dump VM config into file(xml).
 backup-vm-config:

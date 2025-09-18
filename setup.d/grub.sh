@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# required args:  uname (user account) to add docker group
 #
 # load params for build-args from cmd line args like: this-script.sh key1=val1 key2=val2
 for _ARG in "$@"
@@ -11,6 +10,6 @@ done
 
 set -eux
 
-curl -L https://get.docker.com | sh 
-
-usermod -aG docker ${uname}
+# grub
+sed -i '/^GRUB_CMDLINE_LINUX=/c GRUB_CMDLINE_LINUX="biosdevname=0 net.ifnames=0"' /etc/default/grub
+update-grub2

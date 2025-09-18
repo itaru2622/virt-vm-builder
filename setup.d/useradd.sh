@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# cat custom.sh
 
 # required args: uid  uname passwd
 #
@@ -11,10 +10,6 @@ do
 done
 
 set -eux
-
-# grub
-sed -i '/^GRUB_CMDLINE_LINUX=/c GRUB_CMDLINE_LINUX="biosdevname=0 net.ifnames=0"' /etc/default/grub
-update-grub2
 
 addgroup --system --gid ${uid} ${uname}
 adduser  --system --gid ${uid} --uid ${uid} --shell /bin/bash --home /home/${uname} ${uname}
@@ -46,4 +41,3 @@ chmod 600 /etc/sudoers.d/local-admin
 
 # set owner
 chown -R ${uname}:${uname} /home/${uname}
-

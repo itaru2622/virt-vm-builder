@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# cat custom-nic.sh
 
 # required args:  mode(static/dhp) address gateway  nameservers, and prefix
 #
