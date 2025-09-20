@@ -51,8 +51,17 @@ guest_ip_mode ?=static
 pkgs_base    ?=ifupdown,openresolv,net-tools,openssh-server,vim,bash-completion,sudo,curl,keyboard-configuration,network-manager,cloud-guest-utils,e2fsprogs,locales-all,git,make,screen
 pkgs_extra   ?=inxi
 pkgs         ?=${pkgs_base}
+rm_pkgs      ?=inetutils-telnet,systemd-resolved,netplan.io,libnetplan1,netplan-generator,python3-netplan
 
-rm_pkgs      ?=inetutils-telnet,systemd-resolved,netplan.io
+ifneq ($(pkgs),)
+  vpkgs +=--install ${pkgs}
+endif
+
+ifneq ($(rm_pkgs),)
+  _p =$(shell echo ${rm_pkgs} | sed 's/,/ /g')
+  vpkgs +=--run-command 'dpkg --purge ${_p}' --run-command 'apt autoremove --purge -y'
+# vpkgs +=--uninstall ${rm_pkgs}
+endif
 
 # build guest image from virt-builder-repository, such as libguestfs.org etc.
 build: echo ${img}
@@ -60,8 +69,7 @@ ${img}:
 	virt-builder ${distr} -o ${img} --format ${vFormat} \
 	--hostname ${vName} \
 	--root-password password:${rootPass} \
-	--install ${pkgs} \
-	--uninstall ${rm_pkgs} \
+	${vpkgs} \
 	--upload ${sDir}/grub.sh:/tmp    --run-command "/tmp/grub.sh" \
 	--upload ${sDir}/useradd.sh:/tmp --run-command "/tmp/useradd.sh uid=${uID} uname=${uName} passwd=${uPass}" \
 	--upload ${sDir}/docker.sh:/tmp  --run-command "/tmp/docker.sh uname=${uName}" \
@@ -74,13 +82,13 @@ rebuild: ${img}
 	virt-customize -a ${img} \
 	--hostname ${vName} \
 	--root-password password:${rootPass} \
-	--install ${pkgs} \
-	--uninstall ${rm_pkgs} \
+	${vpkgs} \
 	--upload ${sDir}/grub.sh:/tmp    --run-command "/tmp/grub.sh" \
 	--upload ${sDir}/useradd.sh:/tmp --run-command "/tmp/useradd.sh uid=${uID} uname=${uName} passwd=${uPass}" \
 	--upload ${sDir}/docker.sh:/tmp  --run-command "/tmp/docker.sh uname=${uName}" \
 	--upload ${sDir}/nic.sh:/tmp     --run-command "/tmp/nic.sh prefix='' mode=${guest_ip_mode} address=${address} gateway=${gateway} nameservers=\"'${nameservers}'\" " \
 	--delete /etc/resolv.conf  --delete /run/systemd/resolve/resolv.conf
+
 
 # list up supported os by virt-build
 list-supported-os-for-build:
@@ -203,3 +211,6 @@ echo:
 	@echo "nameservers: ${nameservers}"
 	@echo "uID:         ${uID}"
 	@echo "uName:       ${uName}"
+	@echo "pkgs:        ${pkgs}"
+	@echo "rm_pkgs:     ${rm_pkgs}"
+	@echo "vpkgs:       ${vpkgs}"
