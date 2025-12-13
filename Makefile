@@ -7,9 +7,9 @@ nic  ?=br0
 
 # distr:  controled term to select prebuild guest image,  one in `virt-builder -l`, used by virt-builder command
 # osinfo: controled term to optimize the guest VM, one in `osinfo-query os`, used by virt-install command
-distr   ?=debian-12
-osinfo  ?=debian12
-base    ?=debian12-base
+distr   ?=debian-13
+osinfo  ?=debian13
+base    ?=debian13-base
 vFormat ?=qcow2
 
 # account in VM
@@ -77,7 +77,7 @@ ${img}:
 	--delete /etc/resolv.conf  --delete /run/systemd/resolve/resolv.conf
 
 # build guest image from qcow2 provided by https://cloud.debian.org/images/cloud/ etc.
-#  first: curl -sL https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2 >  ${img}
+#  first: curl -sL https://cloud.debian.org/images/cloud/bookworm/latest/debian-13-generic-amd64.qcow2 >  ${img}
 rebuild: ${img}
 	virt-customize -a ${img} \
 	--hostname ${vName} \
