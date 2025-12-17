@@ -8,7 +8,7 @@
       - https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-nocloud-amd64.qcow2
       - https://cloud.debian.org/images/cloud/trixie/latest/debian-13-nocloud-amd64.qcow2
 - Makefile to make ops easy.
-- base VM image is debian-12, defined in Makefile
+- base VM image is debian-13, defined in Makefile
 
 ## install packages and prepare for qemu/virt
 
@@ -118,8 +118,8 @@ qemu-img resize -f qcow2 vm0${n}.qcow2 +${s}G
 # check current partition size:
 sudo fdisk -l
 
-# to resize partion /dev/vda1
-sudo growpart /dev/vda 1
+# to resize partion /dev/sda1
+sudo growpart /dev/sda 1
 
 # check new partition size:
 sudo fdisk -l
@@ -131,6 +131,6 @@ sudo shutdown -r now
 - resize filesystem  @ inside VM
 
 ```bash
-# to resize filesystem /dev/vda1
-sudo /sbin/resize2fs /dev/vda1
+# to resize filesystem /dev/sda1
+sudo /sbin/resize2fs /dev/sda1
 ```
