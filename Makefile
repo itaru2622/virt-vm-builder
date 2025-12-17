@@ -98,7 +98,7 @@ list-supported-os-for-build:
 install-vm: ${img}
 	virt-install ${connOpt} \
 	--disk path=${img} --name ${vName} --memory ${mem} --vcpu ${cpu} --network bridge=${nic},model=virtio,mac=${mac} \
-	--osinfo ${osinfo}  \
+	--os-variant detect=on \
 	--noautoconsole  --noreboot \
 	--boot hd \
 	--import
@@ -109,7 +109,7 @@ install-vm: ${img}
 install-vm-nat: ${img}
 	virt-install ${connOpt} \
 	--disk path=${img} --name ${vName} --memory ${mem} --vcpu ${cpu} --network network=default,model=virtio,mac=${mac} \
-	--osinfo ${osinfo}  \
+	--os-variant detect=on \
 	--noautoconsole  --noreboot \
 	--boot hd \
 	--import
