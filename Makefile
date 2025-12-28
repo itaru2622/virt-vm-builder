@@ -8,6 +8,7 @@ nic  ?=br0
 # distr:  controled term to select prebuild guest image,  one in `virt-builder -l`, used by virt-builder command
 # osinfo: controled term to optimize the guest VM, one in `osinfo-query os`, used by virt-install command
 distr   ?=debian-13
+#osinfo  ?=detect=on
 osinfo  ?=debian13
 base    ?=debian13-base
 vFormat ?=qcow2
@@ -98,7 +99,7 @@ list-supported-os-for-build:
 install-vm: ${img}
 	virt-install ${connOpt} \
 	--disk path=${img} --name ${vName} --memory ${mem} --vcpu ${cpu} --network bridge=${nic},model=virtio,mac=${mac} \
-	--os-variant detect=on \
+	--os-variant ${osinfo} \
 	--noautoconsole  --noreboot \
 	--boot hd \
 	--import
@@ -109,7 +110,7 @@ install-vm: ${img}
 install-vm-nat: ${img}
 	virt-install ${connOpt} \
 	--disk path=${img} --name ${vName} --memory ${mem} --vcpu ${cpu} --network network=default,model=virtio,mac=${mac} \
-	--os-variant detect=on \
+	--os-variant ${osinfo} \
 	--noautoconsole  --noreboot \
 	--boot hd \
 	--import
