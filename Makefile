@@ -44,7 +44,7 @@ mDir        ?=/mnt/virtfs/${vName}
 guest_ip_starts ?= 90
 # make NIC config for guest based on host
 nameservers ?=$(shell cat /etc/resolv.conf | grep -v ^# | grep nameserver | awk '{print $$2}' | paste -sd " " - )
-gateway     ?=$(shell ip route | grep " ${nic}"  | grep ^default  | awk '{print $$3}' )
+gateway     ?=$(shell ip route show dev ${nic} default | awk '{print $$3}' )
 address     ?=$(shell ip addr show ${nic} | grep ' inet ' | awk '{print $$2}' | awk -F '[./]' -v n=${n} -v b=${guest_ip_starts} 'BEGIN {OFS="."} {print $$1,$$2,$$3,b+n "/"$$5}')
 guest_ip_mode ?=static
 #guest_ip_mode ?=dhcp
