@@ -16,7 +16,7 @@ vFormat ?=qcow2
 # account in VM
 rootPass ?=root
 uID      ?=$(shell id -u)
-uName    ?=$(shell id -u -n)
+uName    :=$(if $(uName),$(uName),$(shell id -u -n))
 uPass    ?=${uName}
 
 # default connection for libvirt
