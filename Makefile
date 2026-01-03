@@ -43,7 +43,7 @@ mDir        ?=/mnt/virtfs/${vName}
 # base number of last octet in guest_ip when assigning staticIP
 guest_ip_starts ?= 90
 # make NIC config for guest based on host
-nameservers ?=$(shell cat /etc/resolv.conf | grep -v ^# | grep nameserver | awk '{print $$2}' | paste -sd " " - )
+nameservers ?=$(shell cat /etc/resolv.conf | awk '/^nameserver/ {print $$2}' | paste -sd " " - )
 gateway     ?=$(shell ip route show dev ${nic} default | awk '{print $$3}' )
 address     ?=$(shell ip addr  show     ${nic}         | awk '$$1=="inet" {print $$2}' | awk -F '[./]' -v n=${n} -v b=${guest_ip_starts} -v c='.' '{print $$1 c $$2 c $$3 c b+n "/" $$5}')
 guest_ip_mode ?=static
