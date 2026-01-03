@@ -59,7 +59,10 @@ ifneq ($(pkgs),)
 endif
 
 ifneq ($(rm_pkgs),)
-  _p =$(shell echo ${rm_pkgs} | sed 's/,/ /g')
+  comma := ,
+  null  :=
+  space := $(null) $(null)
+  _p = $(subst ${comma},${space},${rm_pkgs})
   vpkgs +=--run-command 'dpkg --purge ${_p}' --run-command 'apt autoremove --purge -y'
 # vpkgs +=--uninstall ${rm_pkgs}
 endif
