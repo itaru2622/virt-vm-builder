@@ -49,7 +49,7 @@ address     :=$(if $(address),$(address),$(shell ip addr  show     ${nic}       
 guest_ip_mode ?=static
 #guest_ip_mode ?=dhcp
 
-pkgs_base    ?=ifupdown,openresolv,net-tools,openssh-server,vim,bash-completion,sudo,curl,keyboard-configuration,console-data,locales,network-manager,cloud-guest-utils,e2fsprogs,locales-all,git,make,screen
+pkgs_base    ?=ifupdown,openresolv,gpg,net-tools,openssh-server,vim,bash-completion,sudo,curl,keyboard-configuration,console-data,locales,network-manager,cloud-guest-utils,e2fsprogs,locales-all,git,make,screen
 pkgs_extra   ?=inxi
 pkgs         ?=${pkgs_base}
 rm_pkgs      ?=inetutils-telnet,systemd-resolved,netplan.io,libnetplan1,netplan-generator,python3-netplan
