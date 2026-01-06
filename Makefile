@@ -8,8 +8,8 @@ nic  ?=br0
 # distr:  controled term to select prebuild guest image,  one in `virt-builder -l`, used by virt-builder command
 # osinfo: controled term to optimize the guest VM, one in `osinfo-query os`, used by virt-install command
 distr   ?=debian-13
-#osinfo  ?=detect=on
-osinfo  ?=debian13
+osinfo  ?=detect=on,require=off
+#osinfo  ?=debian13
 base    ?=debian13-base
 vFormat ?=qcow2
 
