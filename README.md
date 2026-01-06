@@ -115,11 +115,12 @@ qemu-img resize -f qcow2 vm0${n}.qcow2 +${s}G
 - resize partition @ inside VM
 
 ```bash
-# check current partition size:
+# check current partition size and disk name (/dev/sda1 or /dev/vda1)
 sudo fdisk -l
 
-# to resize partion /dev/sda1
-sudo growpart /dev/sda 1
+# to resize partion on disk
+d=sda
+sudo growpart /dev/${d} 1
 
 # check new partition size:
 sudo fdisk -l
@@ -131,6 +132,6 @@ sudo shutdown -r now
 - resize filesystem  @ inside VM
 
 ```bash
-# to resize filesystem /dev/sda1
-sudo /sbin/resize2fs /dev/sda1
+# to resize filesystem on disk (/dev/sda1 etc).
+sudo /sbin/resize2fs /dev/${d}1
 ```
