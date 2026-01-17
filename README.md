@@ -19,6 +19,15 @@ sudo osinfo-db-import --local --latest
 sudo usermod -aG kvm,libvirt,libvirt-qemu USER
 ```
 
+## after major upgrading
+
+It may be better to clear the cache to avoid troubles, in case of OS/distro upgrade.
+
+```bash
+# clear the cache for virt-builder | virt-costomize
+rm -rf /var/tmp/.guestfs-*
+```
+
 ## setup network on host
 
 ```bash
