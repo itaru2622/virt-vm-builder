@@ -13,7 +13,8 @@
 ## install packages and prepare for qemu/virt
 
 ```bash
-sudo apt install -y virt-manager qemu-system  osinfo-db-tools guestfs-tools bridge-utils
+# dhcpcd-base is required for virt-builder | virt-customize, when host is debian13(trixie).
+sudo apt install -y virt-manager qemu-system  osinfo-db-tools guestfs-tools bridge-utils   dhcpcd-base
 sudo osinfo-db-import --local --latest
 sudo usermod -aG kvm,libvirt,libvirt-qemu USER
 ```
