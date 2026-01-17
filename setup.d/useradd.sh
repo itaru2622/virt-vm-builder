@@ -30,6 +30,7 @@ if [ -d ${HOME}/profile.d ]; then
 fi' >> /home/${uname}/.bashrc
 
 # sudo config
+mkdir -p /etc/sudoers.d
 tee /etc/sudoers.d/local-admin <<EOS
 Defaults env_keep="http_proxy"
 Defaults env_keep+="https_proxy"
